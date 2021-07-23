@@ -1,6 +1,8 @@
 * {
   margin: 0;
   padding: 0;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 html {
@@ -11,24 +13,31 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
   text-align: center;
-  padding: 0 10px;
 }
 
 .page-wrapper {
   width: 100%;
-  min-width: 370px;
   margin: 0 auto;
-  padding: 45px 0;
+  padding: 45px 15px;
 }
 
 #canvas_wrapper {
   position: relative;
-  max-width: 360px;
-  min-height: 370px;
+  max-width: 600px;
   margin: 35px auto;
-  border: 1px solid #ccc;
   -ms-touch-action: none;
       touch-action: none;
+}
+
+#canvas_wrapper p {
+  position: absolute;
+  top: 65%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  color: #006287;
+  font-size: clamp(12px, calc((75vw - 4.5rem) / 10), 24px);
 }
 
 canvas {
@@ -50,10 +59,10 @@ img {
 
 #emoji {
   position: absolute;
-  top: 50%;
+  top: 45%;
   left: 50%;
-  width: 120px;
-  height: 120px;
+  width: 30%;
+  height: 30%;
   -webkit-transform: translate(-50%, -50%);
           transform: translate(-50%, -50%);
 }
