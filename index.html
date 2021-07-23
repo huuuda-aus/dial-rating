@@ -196,12 +196,12 @@
 
             function getDirection(x1, y1, x2, y2) {
                 var ang = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
-                var val = parseInt((-117 + parseInt((ang + 360) % 360)) / 28);
+                var val = parseInt((-117 + parseInt((ang + 360) % 360)) / (360 / sections));
                 if (val < 0) {
-                    val = val + 12;
+                    val = val + (sections - 1);
                 }
-                if (val > 10) {
-                    val = 10;
+                if (val > sections - 3) {
+                    val = sections - 3;
                 }
                 return Math.abs(val);
             }
