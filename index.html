@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="styles.css" type="text/css" />
+    <title>Rating arc</title>
+</head>
+<body>
+    <div class="page-wrapper">
+        <h2>Please rate our services</h2>
+        <div id="canvas_wrapper">
+            <canvas id="arc_wrapper"></canvas>
+            <canvas id="numbers_wrapper"></canvas>
+            <image src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" usemap="#areas" />
+            <map id="areas" name="#areas"></map>
+        </div>
+    </div>
+    <script>
+        (function(){
+            const wrapper = document.getElementById('canvas_wrapper');
+            const canvas_arc = document.getElementById('arc_wrapper');
+            const canvas_numbers = document.getElementById('numbers_wrapper');
+            const areas = document.getElementById('areas');
+            const deg2rad = Math.PI / 180;
+            const sections = 13;
+            const colors = ['red', 'red', 'red', 'red', 'red', 'red', 'red', 'orange', 'orange', 'green', 'green', 'green'];
+            let rating = 0;
+            let areasDrawn = false;
+            const angleStep = (360 / sections) * deg2rad;
+            canvas_arc.width = 375;
+            canvas_arc.height = 375;
+            canvas_numbers.width = 375;
+            canvas_numbers.height = 375;
+            const centerX = canvas_arc.width / 2;
+            const centerY = canvas_arc.height / 2;
+            
+            const drawSection = (id, r1, r2, fill) => {
+                const angle = (360 / sections) * id * deg2rad;
+                const radius1a = canvas_arc.width * r1;
+                const radius1b = canvas_arc.height * r1;
+                const radius2a = canvas_arc.width * r2;
+                const radius2b = canvas_arc.height * r2;
+
+                var ctx = canvas_arc.getContext('2d');
+                ctx.beginPath();
+                ctx.moveTo(
+                    centerX + Math.sin(angle) * radius1a,
+                    centerY + Math.cos(angle) * radius1b
+                );
+                ctx.lineTo(
+                    centerX + Math.sin(angle) * radius2a,
+                    centerY + Math.cos(angle) * radius2b
+                );
+                if (id < sections - 1) {
+                    ctx.quadraticCurveTo(
+                        centerX + Math.sin(angle + angleStep / 2) * (radius2a * 1.025), 
+                        centerY + Math.cos(angle + angleStep / 2) * (radius2b * 1.025),
+                        centerX + Math.sin(angle + angleStep) * radius2a, 
+                        centerY + Math.cos(angle + angleStep) * radius2b
+                    );
+                    ctx.lineTo(
+                        centerX + Math.sin(angle + angleStep) * radius1a, 
+                        centerY + Math.cos(angle + angleStep) * radius1b
+                    );
+                    ctx.quadraticCurveTo(
+                        centerX + Math.sin(angle + angleStep / 2) * (radius1a * 1.023), 
+                        centerY + Math.cos(angle + angleStep / 2) * (radius1b * 1.023),
+                        centerX + Math.sin(angle) * radius1a, 
+                        centerY + Math.cos(angle) * radius1b
+                    );
+                }
+
+                const num = sections - 1 - (id + 1);
+
+                ctx.strokeStyle = colors[num];
+                ctx.stroke();
+
+                if (fill) {
+                    ctx.fillStyle = colors[num];
+                    ctx.fill();
+                }
+                ctx.closePath();
+
+                // add number
+                var ctx2 = canvas_numbers.getContext('2d');
+                ctx2.font = '16px Arial';
+                ctx2.textAlign = 'center';
+                ctx2.textBaseline = 'middle';
+                if (fill) {
+                    ctx2.fillStyle = '#fff';
+                } else {
+                    ctx2.fillStyle = '#006287';
+                }
+                num >= 0 && 
+                    ctx2.fillText(
+                        num.toString(),
+                        centerX + Math.sin(angle + angleStep / 2) * ((radius2a + radius1a) / 2), 
+                        centerY + Math.cos(angle + angleStep / 2) * ((radius2b + radius1b) / 2),
+                    );
+                
+                // draw clickable html area
+                if (!areasDrawn) {
+                    const poly = document.createElement('area');
+                    poly.shape = 'poly';
+                    poly.coords = parseInt(centerX + Math.sin(angle) * radius1a) + ', ' +
+                        parseInt(centerY + Math.cos(angle) * radius1b) + ', ' +
+                        parseInt(centerX + Math.sin(angle) * radius2a) + ', ' +
+                        parseInt(centerY + Math.cos(angle) * radius2b) + ', ' +
+                        parseInt(centerX + Math.sin(angle + angleStep) * radius2a) + ', ' + 
+                        parseInt(centerY + Math.cos(angle + angleStep) * radius2b) + ', ' +
+                        parseInt(centerX + Math.sin(angle + angleStep) * radius1a) + ', ' +
+                        parseInt(centerY + Math.cos(angle + angleStep) * radius1b) + ', ' +
+                        parseInt(centerX + Math.sin(angle) * radius1a) + ', ' +
+                        parseInt(centerY + Math.cos(angle) * radius1b);
+                    poly.id = 'section' + num;
+                    poly.addEventListener('click' , event => {
+                        rating = num;
+                        ctx.clearRect(0, 0, canvas_arc.width, canvas_arc.height);
+                        ctx2.clearRect(0, 0, canvas_numbers.width, canvas_numbers.height);
+                        drawArc();
+                    });
+                    num >= 0 && areas.appendChild(poly);
+                }
+            }
+
+            const drawArc = () => {
+                for (let l = 1; l < sections; l++) {
+                    drawSection(l, .35, .48, sections - 1 - (l + 1) <= rating);
+                }
+                areasDrawn = true;
+            }
+
+            drawArc();
+        })();
+    </script>
+</body>
+</html>
