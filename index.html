@@ -14,8 +14,6 @@
             <canvas id="arc_wrapper"></canvas>
             <canvas id="numbers_wrapper"></canvas>
             <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" id="emoji" />
-            <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" usemap="#areas" />
-            <map id="areas" name="#areas"></map>
             <canvas 
                 id="lines" 
                 onclick="rate(event)"
@@ -24,7 +22,6 @@
                 ondragstart="dragstart(event)"
                 ondragend="dragend()"
                 ontouchmove="tdragging(event)"
-                ontouchcancel="trate"
             ></canvas>
         </div>
         <p>Click to rate, click the same number again to not rate.</p>
@@ -35,7 +32,6 @@
             const canvas_arc = document.getElementById('arc_wrapper');
             const canvas_lines = document.getElementById('lines');
             const canvas_numbers = document.getElementById('numbers_wrapper');
-            const areas = document.getElementById('areas');
             const deg2rad = Math.PI / 180;
             const sections = 13;
             let ctx, ctx2, ctx3;
@@ -44,10 +40,9 @@
             const ratingWording = ['not likely', 'not likely', 'not likely', 'not likely', 'not likely', 'not likely', 'not likely', 'likely', 'likely', 'absolutely', 'absolutely'];
             const emojis = [0, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4];
             let rating = -1;
-            dragRating = 0;
+            let dragRating = 0;
             let dx = 0;
             let dy = 0;
-            let areasDrawn = false;
             const angleStep = (360 / sections) * deg2rad;
             canvas_arc.width = 375;
             canvas_arc.height = 375;
@@ -55,9 +50,6 @@
             canvas_numbers.height = 375;
             canvas_lines.width = 375;
             canvas_lines.height = 375;
-            const linesOffsetX = canvas_lines.offsetLeft;
-            const linesOffsetY = canvas_lines.offsetTop;
-            console.log(linesOffsetX, linesOffsetY);
             const centerX = canvas_arc.width / 2;
             const centerY = canvas_arc.height / 2;
             
@@ -125,41 +117,12 @@
                         centerY + Math.cos(angle + angleStep / 2) * ((radius2b + radius1b) / 2)
                     );
                 }
-                
-                // draw clickable html area
-                if (!areasDrawn) {
-                    const poly = document.createElement('area');
-                    poly.shape = 'poly';
-                    poly.coords = parseInt(centerX + Math.sin(angle) * radius1a) + ', ' +
-                        parseInt(centerY + Math.cos(angle) * radius1b) + ', ' +
-                        parseInt(centerX + Math.sin(angle) * radius2a) + ', ' +
-                        parseInt(centerY + Math.cos(angle) * radius2b) + ', ' +
-                        parseInt(centerX + Math.sin(angle + angleStep) * radius2a) + ', ' + 
-                        parseInt(centerY + Math.cos(angle + angleStep) * radius2b) + ', ' +
-                        parseInt(centerX + Math.sin(angle + angleStep) * radius1a) + ', ' +
-                        parseInt(centerY + Math.cos(angle + angleStep) * radius1b) + ', ' +
-                        parseInt(centerX + Math.sin(angle) * radius1a) + ', ' +
-                        parseInt(centerY + Math.cos(angle) * radius1b);
-                    poly.id = 'section' + num;
-                    poly.addEventListener('click' , function(event) {
-                        if (rating !== num) {
-                            rating = num;
-                        } else {
-                            rating = -1;
-                        }
-                        redrawArc();
-                    });
-                    if (num >= 0) {
-                        areas.appendChild(poly);
-                    }
-                }
             }
 
             function drawArc() {
                 for (let l = 1; l < sections; l++) {
                     drawSection(l, .35, .48, sections - 1 - (l + 1) <= rating);
                 }
-                areasDrawn = true;
             }
 
             function redrawArc() {
@@ -187,11 +150,6 @@
                     x = dx;
                     y = dy;
                 }
-                // ctx3.clearRect(0, 0, canvas_lines.width, canvas_lines.height);
-                // ctx3.beginPath();
-                // ctx3.moveTo(centerX, centerY);
-                // ctx3.lineTo(x, y);
-                // ctx3.stroke();
                 dragRating = getDirection(centerX, centerY, x, y);
                 dx = x;
                 dy = y;
@@ -210,12 +168,6 @@
                     x = dx;
                     y = dy;
                 }
-                // console.log(x, y);
-                // ctx3.clearRect(0, 0, canvas_lines.width, canvas_lines.height);
-                // ctx3.beginPath();
-                // ctx3.moveTo(centerX, centerY);
-                // ctx3.lineTo(x, y);
-                // ctx3.stroke();
                 dragRating = getDirection(centerX, centerY, x, y);
                 dx = x;
                 dy = y;
