@@ -23,10 +23,8 @@
                 ondrag="dragging(event)"
                 ondragstart="dragstart(event)"
                 ondragend="dragend()"
-                ontouchstart="dragstart(event)"
-                ontouchmove="dragging(event)"
-                ontouchend="dragend()"
-                ontouchcancel="rate(event)"
+                ontouchmove="tdragging(event)"
+                ontouchcancel="trate"
             ></canvas>
         </div>
         <p>Click to rate, click the same number again to not rate.</p>
@@ -57,6 +55,9 @@
             canvas_numbers.height = 375;
             canvas_lines.width = 375;
             canvas_lines.height = 375;
+            const linesOffsetX = canvas_lines.offsetLeft;
+            const linesOffsetY = canvas_lines.offsetTop;
+            console.log(linesOffsetX, linesOffsetY);
             const centerX = canvas_arc.width / 2;
             const centerY = canvas_arc.height / 2;
             
@@ -182,15 +183,39 @@
                 var rect = e.target.getBoundingClientRect();
                 var x = e.clientX - rect.left;
                 var y = e.clientY - rect.top;
+                if (x < 0 && y < 0 && dx !== 0 && dy !== 0) {
+                    x = dx;
+                    y = dy;
+                }
+                // ctx3.clearRect(0, 0, canvas_lines.width, canvas_lines.height);
+                // ctx3.beginPath();
+                // ctx3.moveTo(centerX, centerY);
+                // ctx3.lineTo(x, y);
+                // ctx3.stroke();
+                dragRating = getDirection(centerX, centerY, x, y);
+                dx = x;
+                dy = y;
+                if (dragRating !== rating) {
+                    rating = dragRating;
+                    redrawArc();
+                }
+            }
+
+            function tdragging(e) {
+                var touch = e.changedTouches;
+                var rect = canvas_lines.getBoundingClientRect();
+                var x = touch[0].clientX - rect.left;
+                var y = touch[0].clientY - rect.top;
                 if (x < 0 && y < 0) {
                     x = dx;
                     y = dy;
                 }
-                ctx3.clearRect(0, 0, canvas_lines.width, canvas_lines.height);
-                ctx3.beginPath();
-                ctx3.moveTo(centerX, centerY);
-                ctx3.lineTo(x, y);
-                ctx3.stroke();
+                // console.log(x, y);
+                // ctx3.clearRect(0, 0, canvas_lines.width, canvas_lines.height);
+                // ctx3.beginPath();
+                // ctx3.moveTo(centerX, centerY);
+                // ctx3.lineTo(x, y);
+                // ctx3.stroke();
                 dragRating = getDirection(centerX, centerY, x, y);
                 dx = x;
                 dy = y;
@@ -230,7 +255,7 @@
             }
 
             function dragend() {
-                ctx3.clearRect(0, 0, canvas_lines.width, canvas_lines.height);
+                // ctx3.clearRect(0, 0, canvas_lines.width, canvas_lines.height);
                 rating = dragRating;
                 redrawArc();
             }
