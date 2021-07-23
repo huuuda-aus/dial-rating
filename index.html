@@ -39,6 +39,10 @@
             const colors = ['red', 'red', 'red', 'red', 'red', 'red', 'red', 'orange', 'orange', 'green', 'green'];
             const ratingWording = ['not likely', 'not likely', 'not likely', 'not likely', 'not likely', 'not likely', 'not likely', 'likely', 'likely', 'absolutely', 'absolutely'];
             const emojis = [0, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4];
+            const eId = [...new Set(emojis)];
+            eId.forEach(function(id) {
+                (new Image()).src = id + '.png';
+            });
             let rating = -1;
             let dragRating = 0;
             let dx = 0;
