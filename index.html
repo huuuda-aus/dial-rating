@@ -26,6 +26,7 @@
                 ontouchstart="dragstart(event)"
                 ontouchmove="dragging(event)"
                 ontouchend="dragend()"
+                ontouchcancel="rate(event)"
             ></canvas>
         </div>
         <p>Click to rate, click the same number again to not rate.</p>
@@ -185,11 +186,11 @@
                     x = dx;
                     y = dy;
                 }
-                // ctx3.clearRect(0, 0, canvas_lines.width, canvas_lines.height);
-                // ctx3.beginPath();
-                // ctx3.moveTo(centerX, centerY);
-                // ctx3.lineTo(x, y);
-                // ctx3.stroke();
+                ctx3.clearRect(0, 0, canvas_lines.width, canvas_lines.height);
+                ctx3.beginPath();
+                ctx3.moveTo(centerX, centerY);
+                ctx3.lineTo(x, y);
+                ctx3.stroke();
                 dragRating = getDirection(centerX, centerY, x, y);
                 dx = x;
                 dy = y;
@@ -229,7 +230,7 @@
             }
 
             function dragend() {
-                // ctx3.clearRect(0, 0, canvas_lines.width, canvas_lines.height);
+                ctx3.clearRect(0, 0, canvas_lines.width, canvas_lines.height);
                 rating = dragRating;
                 redrawArc();
             }
