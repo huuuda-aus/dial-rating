@@ -9,11 +9,13 @@
 </head>
 <body>
     <div class="page-wrapper">
-        <h2>Please rate our services</h2>
+        <h2>Would you recommend our services to everyone?</h2>
         <div id="canvas_wrapper">
             <canvas id="arc_wrapper"></canvas>
             <canvas id="numbers_wrapper"></canvas>
-            <image src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" usemap="#areas" />
+            <canvas id="lines"></canvas>
+            <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" id="emoji" />
+            <image draggable="true" ondrag="dragging(event)" ondragend="clearLine()" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" usemap="#areas" />
             <map id="areas" name="#areas"></map>
         </div>
     </div>
@@ -21,18 +23,26 @@
         (function(){
             const wrapper = document.getElementById('canvas_wrapper');
             const canvas_arc = document.getElementById('arc_wrapper');
+            const canvas_lines = document.getElementById('lines');
             const canvas_numbers = document.getElementById('numbers_wrapper');
             const areas = document.getElementById('areas');
             const deg2rad = Math.PI / 180;
             const sections = 13;
-            const colors = ['red', 'red', 'red', 'red', 'red', 'red', 'red', 'orange', 'orange', 'green', 'green', 'green'];
-            let rating = 0;
+            let ctx, ctx2, ctx3;
+            ctx3 = canvas_lines.getContext('2d');
+            const colors = ['red', 'red', 'red', 'red', 'red', 'red', 'red', 'orange', 'orange', 'green', 'green'];
+            const ratingWording = ['not likely', 'not likely', 'not likely', 'not likely', 'not likely', 'not likely', 'not likely', 'likely', 'likely', 'absolutely', 'absolutely'];
+            const emojis = [0, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4];
+            let rating = -1;
+            dragRating = 0;
             let areasDrawn = false;
             const angleStep = (360 / sections) * deg2rad;
             canvas_arc.width = 375;
             canvas_arc.height = 375;
             canvas_numbers.width = 375;
             canvas_numbers.height = 375;
+            canvas_lines.width = 375;
+            canvas_lines.height = 375;
             const centerX = canvas_arc.width / 2;
             const centerY = canvas_arc.height / 2;
             
@@ -43,7 +53,7 @@
                 const radius2a = canvas_arc.width * r2;
                 const radius2b = canvas_arc.height * r2;
 
-                var ctx = canvas_arc.getContext('2d');
+                ctx = canvas_arc.getContext('2d');
                 ctx.beginPath();
                 ctx.moveTo(
                     centerX + Math.sin(angle) * radius1a,
@@ -84,7 +94,7 @@
                 ctx.closePath();
 
                 // add number
-                var ctx2 = canvas_numbers.getContext('2d');
+                ctx2 = canvas_numbers.getContext('2d');
                 ctx2.font = '16px Arial';
                 ctx2.textAlign = 'center';
                 ctx2.textBaseline = 'middle';
@@ -116,10 +126,12 @@
                         parseInt(centerY + Math.cos(angle) * radius1b);
                     poly.id = 'section' + num;
                     poly.addEventListener('click' , event => {
-                        rating = num;
-                        ctx.clearRect(0, 0, canvas_arc.width, canvas_arc.height);
-                        ctx2.clearRect(0, 0, canvas_numbers.width, canvas_numbers.height);
-                        drawArc();
+                        if (rating !== num) {
+                            rating = num;
+                        } else {
+                            rating = -1;
+                        }
+                        redrawArc();
                     });
                     num >= 0 && areas.appendChild(poly);
                 }
@@ -132,7 +144,61 @@
                 areasDrawn = true;
             }
 
+            redrawArc = () => {
+                ctx.clearRect(0, 0, canvas_arc.width, canvas_arc.height);
+                ctx2.clearRect(0, 0, canvas_numbers.width, canvas_numbers.height);
+                drawArc();
+                redrawSmiley(rating);
+                console.log('RATING: ', rating > -1 ? rating : 'N/A', ' - ', rating > -1 ? ratingWording[rating] : 'N/A');
+            };
+
             drawArc();
+
+            dragging = e => {
+                var rect = e.target.getBoundingClientRect();
+                var x = e.clientX - rect.left;
+                var y = e.clientY - rect.top;
+                if (x < 0 && y < 0) {
+                    x = dx;
+                    y = dy;
+                }
+                ctx3.clearRect(0, 0, canvas_lines.width, canvas_lines.height);
+                ctx3.beginPath();
+                ctx3.moveTo(centerX, centerY);
+                ctx3.lineTo(x, y);
+                ctx3.stroke();
+                // console.log(centerX, centerY, x, y, getDirection(centerX, centerY, x, y));
+                dragRating = getDirection(centerX, centerY, x, y);
+                dx = x;
+                dy = y;
+            };
+
+            getDirection = (x1, y1, x2, y2) => {
+                var ang = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+                var val = parseInt((-117 + parseInt((ang + 360) % 360)) / 28);
+                if (val < 0) {
+                    val = val + 12;
+                }
+                if (val > 10) {
+                    val = 10;
+                }
+                return Math.abs(val);
+            };
+
+            clearLine = () => {
+                ctx3.clearRect(0, 0, canvas_lines.width, canvas_lines.height);
+                rating = dragRating;
+                redrawArc();
+            };
+
+            redrawSmiley = rating => {
+                console.log(emojis[rating] + '.png');
+                if (rating < 0) {
+                    document.getElementById('emoji').src = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+                } else {
+                    document.getElementById('emoji').src = emojis[rating] + '.png';
+                }
+            };
         })();
     </script>
 </body>
