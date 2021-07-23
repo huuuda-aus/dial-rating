@@ -160,6 +160,7 @@
             }
 
             function tdragging(e) {
+                e.preventDefault();
                 var touch = e.changedTouches;
                 var rect = canvas_lines.getBoundingClientRect();
                 var x = touch[0].clientX - rect.left;
