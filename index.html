@@ -13,10 +13,10 @@
         <div id="canvas_wrapper">
             <canvas id="arc_wrapper"></canvas>
             <canvas id="numbers_wrapper"></canvas>
-            <canvas id="lines"></canvas>
             <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" id="emoji" />
-            <img draggable="true" ondrag="dragging(event)" ondragend="clearLine()" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" usemap="#areas" />
+            <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" usemap="#areas" />
             <map id="areas" name="#areas"></map>
+            <canvas id="lines" onclick="rate(event)" draggable="true" ondrag="dragging(event)" ondragstart="dragstart(event)" ondragend="dragend()"></canvas>
         </div>
         <p>Click to rate, click the same number again to not rate.</p>
     </div>
@@ -160,7 +160,14 @@
 
             drawArc();
 
+            function dragstart(e) {
+                var img = document.createElement("img");
+                img.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+                e.dataTransfer.setDragImage(img, 0, 0);
+            }
+
             function dragging(e) {
+                e.dataTransfer.dropEffect = 'none';
                 var rect = e.target.getBoundingClientRect();
                 var x = e.clientX - rect.left;
                 var y = e.clientY - rect.top;
@@ -168,12 +175,11 @@
                     x = dx;
                     y = dy;
                 }
-                ctx3.clearRect(0, 0, canvas_lines.width, canvas_lines.height);
-                ctx3.beginPath();
-                ctx3.moveTo(centerX, centerY);
-                ctx3.lineTo(x, y);
-                ctx3.stroke();
-                // console.log(centerX, centerY, x, y, getDirection(centerX, centerY, x, y));
+                // ctx3.clearRect(0, 0, canvas_lines.width, canvas_lines.height);
+                // ctx3.beginPath();
+                // ctx3.moveTo(centerX, centerY);
+                // ctx3.lineTo(x, y);
+                // ctx3.stroke();
                 dragRating = getDirection(centerX, centerY, x, y);
                 dx = x;
                 dy = y;
@@ -181,6 +187,23 @@
                     rating = dragRating;
                     redrawArc();
                 }
+            }
+
+            function rate(e) {
+                var rect = e.target.getBoundingClientRect();
+                var x = e.clientX - rect.left;
+                var y = e.clientY - rect.top;
+                if (x < 0 && y < 0) {
+                    x = dx;
+                    y = dy;
+                }
+                var newRating = getDirection(centerX, centerY, x, y);
+                if (newRating !== rating) {
+                    rating = newRating;
+                } else {
+                    rating = -1;
+                }
+                redrawArc();
             }
 
             function getDirection(x1, y1, x2, y2) {
@@ -195,8 +218,8 @@
                 return Math.abs(val);
             }
 
-            function clearLine() {
-                ctx3.clearRect(0, 0, canvas_lines.width, canvas_lines.height);
+            function dragend() {
+                // ctx3.clearRect(0, 0, canvas_lines.width, canvas_lines.height);
                 rating = dragRating;
                 redrawArc();
             }
