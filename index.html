@@ -21,6 +21,7 @@
                 ondrag="dragging(event)"
                 ondragstart="dragstart(event)"
                 ondragend="dragend()"
+                ontouchstart="tdragstart(event)"
                 ontouchmove="tdragging(event)"
             ></canvas>
         </div>
@@ -141,6 +142,8 @@
                 e.dataTransfer.setDragImage(img, 0, 0);
             }
 
+            function tdragstart(e) {}
+
             function dragging(e) {
                 e.dataTransfer.dropEffect = 'none';
                 var rect = e.target.getBoundingClientRect();
@@ -161,7 +164,7 @@
 
             function tdragging(e) {
                 e.preventDefault();
-                var touch = e.changedTouches;
+                var touch = e.touches;
                 var rect = canvas_lines.getBoundingClientRect();
                 var x = touch[0].clientX - rect.left;
                 var y = touch[0].clientY - rect.top;
@@ -179,6 +182,7 @@
             }
 
             function rate(e) {
+                console.log('rating!');
                 var rect = e.target.getBoundingClientRect();
                 var x = e.clientX - rect.left;
                 var y = e.clientY - rect.top;
