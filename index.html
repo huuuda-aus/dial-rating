@@ -14,6 +14,7 @@
             <canvas id="arc_wrapper"></canvas>
             <canvas id="numbers_wrapper"></canvas>
             <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" id="emoji" />
+            <p id="ratingStatus">Please rate...</p>
             <canvas 
                 id="lines" 
                 onclick="rate(event)"
@@ -29,6 +30,8 @@
     </div>
     <script>
         // (function(){
+            const wrapper = document.getElementById('canvas_wrapper');
+            wrapper.style.height = wrapper.offsetWidth + 'px';
             const canvas_arc = document.getElementById('arc_wrapper');
             const canvas_lines = document.getElementById('lines');
             const canvas_numbers = document.getElementById('numbers_wrapper');
@@ -37,7 +40,7 @@
             let ctx, ctx2, ctx3;
             ctx3 = canvas_lines.getContext('2d');
             const colors = ['red', 'red', 'red', 'red', 'red', 'red', 'red', 'orange', 'orange', 'green', 'green'];
-            const ratingWording = ['not likely', 'not likely', 'not likely', 'not likely', 'not likely', 'not likely', 'not likely', 'likely', 'likely', 'absolutely', 'absolutely'];
+            const ratingWording = ['Absolutely not!', 'Very unlikely', 'Probably not', 'Not likely', 'Maybe', 'Probably', 'If you insist', 'Likely', 'Very likely', 'For sure', 'Absolutely!'];
             const emojis = [0, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4];
             const eId = [...new Set(emojis)];
             eId.forEach(function(id) {
@@ -48,14 +51,27 @@
             let dx = 0;
             let dy = 0;
             const angleStep = (360 / sections) * deg2rad;
-            canvas_arc.width = 375;
-            canvas_arc.height = 375;
-            canvas_numbers.width = 375;
-            canvas_numbers.height = 375;
-            canvas_lines.width = 375;
-            canvas_lines.height = 375;
-            const centerX = canvas_arc.width / 2;
-            const centerY = canvas_arc.height / 2;
+            canvas_arc.width = wrapper.offsetWidth;
+            canvas_arc.height = wrapper.offsetWidth;
+            canvas_numbers.width = wrapper.offsetWidth;
+            canvas_numbers.height = wrapper.offsetWidth;
+            canvas_lines.width = wrapper.offsetWidth;
+            canvas_lines.height = wrapper.offsetWidth;
+            centerX = canvas_arc.width / 2;
+            centerY = canvas_arc.height / 2;
+
+            window.addEventListener('resize', function() {
+                wrapper.style.height = wrapper.offsetWidth + 'px';
+                canvas_arc.width = wrapper.offsetWidth;
+                canvas_arc.height = wrapper.offsetWidth;
+                canvas_numbers.width = wrapper.offsetWidth;
+                canvas_numbers.height = wrapper.offsetWidth;
+                canvas_lines.width = wrapper.offsetWidth;
+                canvas_lines.height = wrapper.offsetWidth;
+                centerX = canvas_arc.width / 2;
+                centerY = canvas_arc.height / 2;
+                redrawArc();
+            });
             
             function drawSection(id, r1, r2, fill) {
                 const angle = (360 / sections) * id * deg2rad;
@@ -223,8 +239,10 @@
             function redrawSmiley(rating) {
                 if (rating < 0) {
                     document.getElementById('emoji').src = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+                    document.getElementById('ratingStatus').innerText = "Please rate...";
                 } else {
                     document.getElementById('emoji').src = emojis[rating] + '.png';
+                    document.getElementById('ratingStatus').innerText = ratingWording[rating];
                 }
             }
         // })();
