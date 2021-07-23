@@ -16,7 +16,17 @@
             <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" id="emoji" />
             <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" usemap="#areas" />
             <map id="areas" name="#areas"></map>
-            <canvas id="lines" onclick="rate(event)" draggable="true" ondrag="dragging(event)" ondragstart="dragstart(event)" ondragend="dragend()"></canvas>
+            <canvas 
+                id="lines" 
+                onclick="rate(event)"
+                draggable="true"
+                ondrag="dragging(event)"
+                ondragstart="dragstart(event)"
+                ondragend="dragend()"
+                ontouchstart="dragstart(event)"
+                ontouchmove="dragging(event)"
+                ontouchend="dragend()"
+            ></canvas>
         </div>
         <p>Click to rate, click the same number again to not rate.</p>
     </div>
