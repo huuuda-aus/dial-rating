@@ -6,8 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="styles.css" type="text/css" />
     <title>Rating arc</title>
-    <script>
-    </script>
 </head>
 <body>
     <div class="page-wrapper">
@@ -17,13 +15,13 @@
             <canvas id="numbers_wrapper"></canvas>
             <canvas id="lines"></canvas>
             <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" id="emoji" />
-            <img draggable="true" ondrag="javascript:dragging(event)" ondragend="clearLine()" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" usemap="#areas" />
+            <img draggable="true" ondrag="dragging(event)" ondragend="clearLine()" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" usemap="#areas" />
             <map id="areas" name="#areas"></map>
         </div>
         <p>Click to rate, click the same number again to not rate.</p>
     </div>
     <script>
-        (function(){
+        // (function(){
             const wrapper = document.getElementById('canvas_wrapper');
             const canvas_arc = document.getElementById('arc_wrapper');
             const canvas_lines = document.getElementById('lines');
@@ -38,6 +36,8 @@
             const emojis = [0, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4];
             let rating = -1;
             dragRating = 0;
+            let dx = 0;
+            let dy = 0;
             let areasDrawn = false;
             const angleStep = (360 / sections) * deg2rad;
             canvas_arc.width = 375;
@@ -177,6 +177,10 @@
                 dragRating = getDirection(centerX, centerY, x, y);
                 dx = x;
                 dy = y;
+                if (dragRating !== rating) {
+                    rating = dragRating;
+                    redrawArc();
+                }
             }
 
             function getDirection(x1, y1, x2, y2) {
@@ -198,14 +202,13 @@
             }
 
             function redrawSmiley(rating) {
-                console.log(emojis[rating] + '.png');
                 if (rating < 0) {
                     document.getElementById('emoji').src = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
                 } else {
                     document.getElementById('emoji').src = emojis[rating] + '.png';
                 }
             }
-        })();
+        // })();
     </script>
 </body>
 </html>
