@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="styles.css" type="text/css" />
     <title>Rating arc</title>
+    <script>
+    </script>
 </head>
 <body>
     <div class="page-wrapper">
@@ -14,12 +16,11 @@
             <canvas id="arc_wrapper"></canvas>
             <canvas id="numbers_wrapper"></canvas>
             <canvas id="lines"></canvas>
-            <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" id="emoji" />
-            <image draggable="true" ondrag="dragging(event)" ondragend="clearLine()" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" usemap="#areas" />
+            <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" id="emoji" />
+            <img draggable="true" ondrag="javascript:dragging(event)" ondragend="clearLine()" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" usemap="#areas" />
             <map id="areas" name="#areas"></map>
         </div>
         <p>Click to rate, click the same number again to not rate.</p>
-        <p>Drag inside the inner radius to rate as well (limited options as we cannot drag on the actual number tiles).</p>
     </div>
     <script>
         (function(){
@@ -48,7 +49,7 @@
             const centerX = canvas_arc.width / 2;
             const centerY = canvas_arc.height / 2;
             
-            const drawSection = (id, r1, r2, fill) => {
+            function drawSection(id, r1, r2, fill) {
                 const angle = (360 / sections) * id * deg2rad;
                 const radius1a = canvas_arc.width * r1;
                 const radius1b = canvas_arc.height * r1;
@@ -105,12 +106,13 @@
                 } else {
                     ctx2.fillStyle = '#006287';
                 }
-                num >= 0 && 
+                if (num >= 0) { 
                     ctx2.fillText(
                         num.toString(),
                         centerX + Math.sin(angle + angleStep / 2) * ((radius2a + radius1a) / 2), 
-                        centerY + Math.cos(angle + angleStep / 2) * ((radius2b + radius1b) / 2),
+                        centerY + Math.cos(angle + angleStep / 2) * ((radius2b + radius1b) / 2)
                     );
+                }
                 
                 // draw clickable html area
                 if (!areasDrawn) {
@@ -127,7 +129,7 @@
                         parseInt(centerX + Math.sin(angle) * radius1a) + ', ' +
                         parseInt(centerY + Math.cos(angle) * radius1b);
                     poly.id = 'section' + num;
-                    poly.addEventListener('click' , event => {
+                    poly.addEventListener('click' , function(event) {
                         if (rating !== num) {
                             rating = num;
                         } else {
@@ -135,28 +137,30 @@
                         }
                         redrawArc();
                     });
-                    num >= 0 && areas.appendChild(poly);
+                    if (num >= 0) {
+                        areas.appendChild(poly);
+                    }
                 }
             }
 
-            const drawArc = () => {
+            function drawArc() {
                 for (let l = 1; l < sections; l++) {
                     drawSection(l, .35, .48, sections - 1 - (l + 1) <= rating);
                 }
                 areasDrawn = true;
             }
 
-            redrawArc = () => {
+            function redrawArc() {
                 ctx.clearRect(0, 0, canvas_arc.width, canvas_arc.height);
                 ctx2.clearRect(0, 0, canvas_numbers.width, canvas_numbers.height);
                 drawArc();
                 redrawSmiley(rating);
                 console.log('RATING: ', rating > -1 ? rating : 'N/A', ' - ', rating > -1 ? ratingWording[rating] : 'N/A');
-            };
+            }
 
             drawArc();
 
-            dragging = e => {
+            function dragging(e) {
                 var rect = e.target.getBoundingClientRect();
                 var x = e.clientX - rect.left;
                 var y = e.clientY - rect.top;
@@ -173,9 +177,9 @@
                 dragRating = getDirection(centerX, centerY, x, y);
                 dx = x;
                 dy = y;
-            };
+            }
 
-            getDirection = (x1, y1, x2, y2) => {
+            function getDirection(x1, y1, x2, y2) {
                 var ang = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
                 var val = parseInt((-117 + parseInt((ang + 360) % 360)) / 28);
                 if (val < 0) {
@@ -185,22 +189,22 @@
                     val = 10;
                 }
                 return Math.abs(val);
-            };
+            }
 
-            clearLine = () => {
+            function clearLine() {
                 ctx3.clearRect(0, 0, canvas_lines.width, canvas_lines.height);
                 rating = dragRating;
                 redrawArc();
-            };
+            }
 
-            redrawSmiley = rating => {
+            function redrawSmiley(rating) {
                 console.log(emojis[rating] + '.png');
                 if (rating < 0) {
                     document.getElementById('emoji').src = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
                 } else {
                     document.getElementById('emoji').src = emojis[rating] + '.png';
                 }
-            };
+            }
         })();
     </script>
 </body>
